@@ -5,7 +5,9 @@ date: "November 28, 2017"
 output:
     html_document:
         toc: true
-        theme: null
+        toc_float:
+            collapsed: false
+        theme: cerulean
 ---
 
 ```{r setup, include=FALSE}
