@@ -1,3 +1,8 @@
+Notes on the Beta distribution
+================
+Elias Kalamaras
+November 28, 2017
+
 The Beta distribution is closely related to the Binomial distribution, so let's take first a look at the Binomial distribution.
 
 Binomial distribution
