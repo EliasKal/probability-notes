@@ -21,6 +21,7 @@ The Binomial distribution describes the probability of a certain number of succe
 The Binomial distribution involves three parameters: the total number of trials, $n$, the number of successes, $k$, for which we wish to measure the probability, and the probability $q$ of a single trial being successful. In our example above, $n = 15$, $k = 10$ and $q = 0.5$, where we considered that the coin is fair, i.e. the chance of getting heads is equal to the chance of getting tails.
 
 The Binomial distribution is defined as:
+
 $$
 p(k | n, q) = {n \choose k} q^k (1-q)^{n-k}
 $$
@@ -88,6 +89,7 @@ Using the rule of Bayes, we can compute this probability from the Binomial proba
 $$
 p(q | n, k) = \frac{p(k | n, q)\ p(q | n)}{p(k | n)}
 $$
+
 Let's consider that we wanted to compute the probability of $q$ being 0.7, i.e. of the coin being biased, given that we make 15 trials and getting 10 successes. In other words, we want to compute $p(q = 0.7 | n = 15, k = 10)$. Using the rule of Bayes, this would be computed as:
 
 $$
