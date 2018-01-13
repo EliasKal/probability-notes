@@ -239,7 +239,7 @@ n = 2</code></pre>
 <pre class="r"><code>k1_set = seq(0, n)
 k2_set = seq(0, n)
 k3_set = seq(0, n)</code></pre>
-<p>We have 3 variables that we do know know beforehand, i.e. <span class="math inline">\(k_1\)</span>, <span class="math inline">\(k_2\)</span> and <span class="math inline">\(k_3\)</span>. We will try to compute the joint distribution of these variables.</p>
+<p>We have 3 variables that we do not know beforehand, i.e. <span class="math inline">\(k_1\)</span>, <span class="math inline">\(k_2\)</span> and <span class="math inline">\(k_3\)</span>. We will try to compute the joint distribution of these variables.</p>
 <p>For this, we will first consider all possible combinations of these three variables.</p>
 <pre class="r"><code>df &lt;- expand.grid(k1 = k1_set, k2 = k2_set, k3 = k3_set)
 print(df)</code></pre>
