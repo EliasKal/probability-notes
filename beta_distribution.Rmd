@@ -3,7 +3,11 @@ title: "Notes on the Beta distribution"
 author: "Elias Kalamaras"
 date: "November 28, 2017"
 output:
-    html_document
+    html_document:
+        toc: true
+        toc_float:
+            collapsed: false
+        theme: journal
 ---
 
 ```{r setup, include=FALSE}
