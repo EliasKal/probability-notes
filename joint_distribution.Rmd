@@ -34,7 +34,7 @@ k2_set = seq(0, n)
 k3_set = seq(0, n)
 ```
 
-We have 3 variables that we do know know beforehand, i.e. $k_1$, $k_2$ and $k_3$. We will try to compute the joint distribution of these variables.
+We have 3 variables that we do not know beforehand, i.e. $k_1$, $k_2$ and $k_3$. We will try to compute the joint distribution of these variables.
 
 For this, we will first consider all possible combinations of these three variables.
 
