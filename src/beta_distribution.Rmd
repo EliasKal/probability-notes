@@ -2,7 +2,7 @@
 title: "Notes on the Beta distribution"
 author: "Elias Kalamaras"
 date: "November 28, 2017"
-output: html_document
+output: md_document
 ---
 
 ```{r setup, include=FALSE}
