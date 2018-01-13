@@ -11,6 +11,7 @@
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
     <script type="text/javascript"
         src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
     </script>
@@ -51,6 +52,20 @@
       </footer>
     </div>
     <script src="{{ '/assets/js/scale.fix.js' | relative_url }}"></script>
+    
+    <script>
+      $("script[type='math/tex']").replaceWith(
+        function(){
+          var tex = $(this).text();
+          return "$" + tex + "$";
+      });
+
+      $("script[type='math/tex; mode=display']").replaceWith(
+        function(){
+          var tex = $(this).text();
+          return "$$" + tex + "$$";
+      });
+    </script>
 
 
   {% if site.google_analytics %}
