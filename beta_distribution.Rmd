@@ -7,7 +7,7 @@ output:
         toc: true
         toc_float:
             collapsed: false
-        theme: journal
+        theme: readable
 ---
 
 ```{r setup, include=FALSE}
@@ -247,7 +247,7 @@ posterior.plot <- function(n, k) {
     ggplot(data.frame(q = q.vals), aes(x = q, y = posterior(q, n, k))) +
         geom_line() +
         geom_point() +
-        labs(y = paste('p (n = ', n, ', k = ', k))
+        labs(y = paste('p (n = ', n, ', k = ', k, ')'))
 }
 ```
 
