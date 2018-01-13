@@ -1,0 +1,164 @@
+---
+title: "Notes on joint distribution"
+author: "Elias Kalamaras"
+date: "January 7, 2018"
+output:
+    html_document:
+        toc: true
+        toc_float:
+            collapsed: false
+        theme: cerulean
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+```
+
+## One coin, known bias
+
+Let's start with a case of one coin of known bias. Let the probability of heads be $q$. We will make 3 experiments, throwing the coin $n$ times in each experiment, and count the number of heads, $k_1$, $k_2$ and $k_3$, in each experiment.
+
+We consider that the bias of the coin is known and fixed in all experiments, as is the number of coin tosses in each experiment.
+
+```{r}
+q = 0.6
+n = 2
+```
+
+Since we throw the coin $n$ times in each experiment, the number of heads in each experiment takes values in the range $\{0, \ldots n\}$.
+
+```{r}
+k1_set = seq(0, n)
+k2_set = seq(0, n)
+k3_set = seq(0, n)
+```
+
+We have 3 variables that we do know know beforehand, i.e. $k_1$, $k_2$ and $k_3$. We will try to compute the joint distribution of these variables.
+
+For this, we will first consider all possible combinations of these three variables.
+
+```{r}
+df <- expand.grid(k1 = k1_set, k2 = k2_set, k3 = k3_set)
+print(df)
+```
+
+For each combination, we will compute the probability of this combination occuring. Since the number of heads in each experiment does not depend on the number of heads in the other experiments, the three variables are independent, so the joint probability will be the product of the individual probabilities for each variable.
+
+The probability of obtaining $k$ heads in $n$ tosses, when the bias of the coin towards heads is $q$ is given by the binomial distribution:
+$$
+p(k | n, q) = {n \choose k} q^k (1-q)^{n-k}
+$$
+
+So, the probability of each combination of $k_1$, $k_2$ and $k_3$ is the product of 3 binomial probabilities. Let's add another column to the table above, containing this joint probability.
+
+```{r}
+df$p = dbinom(df$k1, n, q) * dbinom(df$k2, n, q) * dbinom(df$k3, n, q)
+print(df)
+```
+
+The $p$ column contains the probability of each possible combination of $k$ values in the experiments. Since these are the only possible outcomes, the $p$ column is the complete joint distribution of $k_1$, $k_2$ and $k_3$, summing to 1:
+
+```{r}
+sum(df$p)
+```
+
+The joint distribution allows us to find out some interesting things about our experiment and test different possibilities.
+
+For instance, the most probable $k$ combinations are the following:
+
+```{r}
+df %>% arrange(desc(p)) %>% head(5)
+```
+
+The most probable case is that we get 1 head out of 2 tosses in all three experiments, which is justified by our use of a coin that is close to being unbiased ($q = 0.6$). Other combinations are also likely, such as having 2 heads in one of the three experiments, while the tosses in the other two experiments get 1 head each.
+
+We can also see which are the most likely combinations of the second and third experiment, considering that we know the value of heads in the first experiment. Let's say that we fix the number of heads in the first experiment to 1, so that we select only those cases where $k_1 = 1$.
+
+```{r}
+df %>% filter(k1 == 1) %>% arrange(desc(p))
+```
+
+In order to be correct, we must normalize $p$, so that it adds up to 1, since now that we know $k_1$, the above are the only possible combinations.
+
+```{r}
+df_cond <- df %>% filter(k1 == 1)
+df_cond$p <- df_cond$p / sum(df_cond$p)
+df_cond %>% arrange(desc(p))
+```
+
+In other words, we are dividing the joint probability with the *marginal* probability of $k_1 = 1$, in order to get the conditional probability $p(k_1, k_2 | k_1, q, n)$.
+
+
+## Two coins, known biases
+
+Let's now say that we have two coins, of known biases, but we do not know which coin is tossed in each experiment. So we have another unknown variable, $t \in \{1, 2\}$, showing which coin is tossed each time.
+
+```{r}
+q = c(0.8, 0.2)
+n = 2
+
+t1_set = c(1, 2)
+t2_set = c(1, 2)
+t3_set = c(1, 2)
+
+k1_set = seq(0, n)
+k2_set = seq(0, n)
+k3_set = seq(0, n)
+```
+
+In each experiment, there are now two unknown variables: the coin that is tossed, and the number of heads in $n$ tosses. The possible combinations of all these variables are now much more.
+
+```{r}
+df <- expand.grid(
+    t1 = t1_set,
+    t2 = t2_set,
+    t3 = t3_set,
+    k1 = k1_set,
+    k2 = k2_set,
+    k3 = k3_set
+)
+print(df)
+```
+
+Proceeding as before, we take the joint probability of all these variables. Each pair of $t_i$ an $k_i$ is independent from the others. However, each $t_i$ is not independent from the corresponding $k_i$, as the two coins have different biases. The joint probability $p(t_i, k_i)$ is
+$$
+p(t_i, k_i) = p(t_i) p(k_i | t_i)
+$$
+
+So the total joint probability $p(\mathbf{t}, \mathbf{k})$ is:
+$$
+p(\mathbf{t}, \mathbf{k}) = \prod_{i=1}^3 p(t_i) p(k_i | t_i)
+$$
+
+The probability $p(k_i | t_i)$ is the binomial distribution of $k_i$, given that coin $t_i$ is tossed, i.e. that $q_i$ is used as the bias. The number of tosses in each experiment, $n$, which is fixed throughout the experiments, has been omitted, for simplicity.
+
+The probability of selecting one of the two coins, $p(t_i)$, is considered to be uniform in the available coins, i.e. we are not preferring one coin from the other. In other words, it is set to 0.5.
+
+Let's put another column in the above table, with the joint probability for each combination.
+
+```{r}
+df$p <-
+    0.5 * dbinom(df$k1, n, q[df$t1]) *
+    0.5 * dbinom(df$k2, n, q[df$t2]) *
+    0.5 * dbinom(df$k3, n, q[df$t3])
+print(df)
+```
+
+Again, we can see which are the most probable combinations.
+
+```{r}
+df %>% arrange(desc(p)) %>% head(10)
+```
+
+However, what is more interesting now is that we can find which coin selections are the most probable given a sequence of observed head outcomes. For instance, let's consider that, after performing the three experiments, the number of heads observed are 2, 0 and 1. We can take the conditional probability of the coin selections given this observation, by selecting only those rows of the joint probability table that correspond to these observations and normalizing them.
+
+```{r}
+df_cond <- df %>% filter(k1 == 2 & k2 == 0 & k3 == 1)
+df_cond$p <- df_cond$p / sum(df_cond$p)
+df_cond %>% arrange(desc(p))
+```
+
+We can see that the most probable coin selections is that we selected coin 1 for the first toss, coin 2 for the second, and either coin 1 or 2 for the third. This is justified by the biases of the coins, which are 0.8 and 0.2, for coin 1 and coin 2, respectively.
+
+
