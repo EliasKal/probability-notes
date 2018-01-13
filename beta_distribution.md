@@ -1,8 +1,3 @@
-Notes on the Beta distribution
-================
-Elias Kalamaras
-November 28, 2017
-
 The Beta distribution is closely related to the Binomial distribution, so let's take first a look at the Binomial distribution.
 
 Binomial distribution
@@ -44,7 +39,7 @@ ggplot(data.frame(k = 1:15)) +
     labs(y = 'p')
 ```
 
-<img src="/home/elias/Documents/beta_distribution/output/beta_distribution_files/figure-markdown_github/unnamed-chunk-3-1.png" style="display: block; margin: auto;" />
+<img src="beta_distribution_files/figure-markdown_github/unnamed-chunk-3-1.png" style="display: block; margin: auto;" />
 
 The above diagram shows that the most probable number of successes is around 7 or 8, which is as expected, since we perform 15 trials and we have a fair coin.
 
@@ -70,7 +65,7 @@ ggplot(data.frame(k = 1:15)) +
     labs(y = 'p')
 ```
 
-<img src="/home/elias/Documents/beta_distribution/output/beta_distribution_files/figure-markdown_github/unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
+<img src="beta_distribution_files/figure-markdown_github/unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
 
 which is moved to the right, compared to the distribution of a fair coin. This means that larger nubers of successes are now expected, around 10 or 11.
 
@@ -251,7 +246,7 @@ ggplot(data.frame(q = q.vals), aes(x = q, y = posterior(q, n, k))) +
     labs(y = 'p (n = 15, k = 10)')
 ```
 
-<img src="/home/elias/Documents/beta_distribution/output/beta_distribution_files/figure-markdown_github/unnamed-chunk-18-1.png" style="display: block; margin: auto;" />
+<img src="beta_distribution_files/figure-markdown_github/unnamed-chunk-18-1.png" style="display: block; margin: auto;" />
 
 Let's put the above plot in a function taking *n* and *k* as parameters and try different values.
 
@@ -270,7 +265,7 @@ If we have *n* = 15 trials and we get *k* = 5 successes, we have the fol
 posterior.plot(n = 15, k = 5)
 ```
 
-<img src="/home/elias/Documents/beta_distribution/output/beta_distribution_files/figure-markdown_github/unnamed-chunk-20-1.png" style="display: block; margin: auto;" />
+<img src="beta_distribution_files/figure-markdown_github/unnamed-chunk-20-1.png" style="display: block; margin: auto;" />
 
 Now, the most probable value for *q* is 0.25, which is expected, since we have a small number of successes. However, 0.5 is also a probable value for *q*, as also was when we had 10 successes. In other words, there is a rather high probability of the coin being fair and still having a high or low number of successes.
 
@@ -282,7 +277,7 @@ Continuing the last example, let's say that we make another 15 trials and from t
 posterior.plot(n = 30, k = 12)
 ```
 
-<img src="/home/elias/Documents/beta_distribution/output/beta_distribution_files/figure-markdown_github/unnamed-chunk-21-1.png" style="display: block; margin: auto;" />
+<img src="beta_distribution_files/figure-markdown_github/unnamed-chunk-21-1.png" style="display: block; margin: auto;" />
 
 We can see two changes from the above diagram:
 
@@ -302,7 +297,7 @@ Let's take again the two examples above. The posterior distribution of *q* when 
 posterior.plot(n = 15, k = 5)
 ```
 
-<img src="/home/elias/Documents/beta_distribution/output/beta_distribution_files/figure-markdown_github/unnamed-chunk-23-1.png" style="display: block; margin: auto;" />
+<img src="beta_distribution_files/figure-markdown_github/unnamed-chunk-23-1.png" style="display: block; margin: auto;" />
 
 It is concentrated around the value of 0.3, but other nearby values are probable as well.
 
@@ -312,7 +307,7 @@ In the second case, where we increased the number of trials, i.e. *n* = 30 a
 posterior.plot(n = 30, k = 12)
 ```
 
-<img src="/home/elias/Documents/beta_distribution/output/beta_distribution_files/figure-markdown_github/unnamed-chunk-24-1.png" style="display: block; margin: auto;" />
+<img src="beta_distribution_files/figure-markdown_github/unnamed-chunk-24-1.png" style="display: block; margin: auto;" />
 
 The distribution is shifted to the right (however the coin is still not considered fair), and it is now narrower, since the larger number of trials gave us more certainty in our judgement about *q*.
 
@@ -322,7 +317,7 @@ If we consider even more trials, we could get *n* = 100 and *k* = 38. Th
 posterior.plot(n = 100, k = 38)
 ```
 
-<img src="/home/elias/Documents/beta_distribution/output/beta_distribution_files/figure-markdown_github/unnamed-chunk-25-1.png" style="display: block; margin: auto;" />
+<img src="beta_distribution_files/figure-markdown_github/unnamed-chunk-25-1.png" style="display: block; margin: auto;" />
 
 The distribution is now more concentrated around the value of *q* = 0.38.
 
@@ -368,7 +363,7 @@ ggplot(data.all, aes(x = q, y = p, color = factor(L))) +
     geom_line()
 ```
 
-<img src="/home/elias/Documents/beta_distribution/output/beta_distribution_files/figure-markdown_github/unnamed-chunk-26-1.png" style="display: block; margin: auto;" />
+<img src="beta_distribution_files/figure-markdown_github/unnamed-chunk-26-1.png" style="display: block; margin: auto;" />
 
 When larger sets of possible *q* values are used, the distribution is more detailed, but the probabily of each particular *q* occuring is smaller. If we consider very large numbers of possible values, the probability distribution would tend to zero. However, the more possible values we consider, the less we are interested in the probability of a *particular* *q* occuring. We are more interested in *q* being in a small range of nearby values.
 
