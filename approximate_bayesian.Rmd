@@ -1,0 +1,172 @@
+---
+title: "Notes on Approximate Bayesian Computation"
+author: "Elias Kalamaras"
+date: "January 18, 2018"
+output:
+  html_notebook:
+    toc: yes
+    toc_float:
+      collapsed: no
+  html_document:
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+```
+
+```{r}
+set.seed(42)     # for reproducibility
+```
+
+# Example Markov model
+
+Let's consider a Markov model, where there are two states, A and B, and the transition probability from either state to the other is $\theta$ (the example is based on [this article](https://en.wikipedia.org/wiki/Approximate_Bayesian_computation)). This model could be used to produce sequences of states of arbitrary size. Let's create a function simulating such a sequence.
+
+```{r}
+toggle <- function(state) {
+    ifelse(state == "A", "B", "A")
+}
+
+markov <- function(n, theta) {
+    arr <- character(n)
+    # choose first item randomly
+    arr[1] = ifelse(runif(1) < 0.5, "A", "B")
+    for (i in seq(2, n)) {
+        arr[i] = ifelse(runif(1) < theta, toggle(arr[i-1]), arr[i-1])
+    }
+    arr
+}
+```
+
+Let's try this function with some examples:
+
+```{r}
+markov(10, 0.5)
+markov(10, 0.9)
+markov(15, 0.1)
+```
+
+Let's also create a function that counts how many transitions there are in a given sequence.
+
+```{r}
+countTrans <- function(arr) {
+    cnt <- 0
+    for (i in seq(2, length(arr))) {
+        if (arr[i] != arr[i-1])
+            cnt <- cnt + 1
+    }
+    cnt
+}
+```
+
+For example:
+
+```{r}
+countTrans(c("A", "B", "B", "B", "A", "A", "A", "B", "B", "A"))
+```
+
+# Parameter inference
+
+Let's now suppose that we do not know the $\theta$ parameter of the Markov model and wish to infer it from a given sequence. Let's suppose that the true $\theta$ value is 
+
+```{r}
+thetaTrue <- 0.25
+```
+
+and the given sequence, of size 10, is the following:
+
+```{r}
+dataSeq <- markov(10, thetaTrue)
+print(dataSeq)
+```
+
+One way we can proceed in order to infer the $\theta$ parameter from the data is with Approximate Bayesian Computation (ABC). We will take random choices of theta, generate sequences and see if the number of transitions is similar to the number of transitions of the given data. If it is, we will keep the value of $\theta$ chosen in an array and move on to the next choice of $\theta$.
+
+So, let's create a function to generate an array of possible $\theta$ values from which the given number of transitions could have occured. Our initial guesses for the $\theta$ value will be taken from a uniform distribution over $[0, 1]$. A tolerance argument will also be used, in order to control which $\theta$ values to allow to pass.
+
+```{r}
+abcInf <- function(nSamples, targetSeq, tolerance) {
+    samples <- numeric(nSamples)
+    c <- 1
+    while (c <= nSamples) {
+        theta <- runif(1)
+        testSeq <- markov(length(targetSeq), theta)
+        if (abs(countTrans(testSeq) - countTrans(targetSeq)) <= tolerance) {
+            samples[c] <- theta
+            c <- c + 1
+        }
+    }
+    samples
+}
+```
+
+Let's try this function for producing some $\theta$ samples.
+
+```{r}
+abcInf(10, dataSeq, 1)
+```
+
+We can see that there are some values close to the true value of `thetaTrue`, but there are also some very different values, since they could also have produced the target number of transitions.
+
+Let's take several $\theta$ samples and make a histogram of them, to see the approximate distribution of the $\theta$ values.
+
+```{r}
+samples <- abcInf(100, dataSeq, 1)
+hist(samples, breaks = seq(0, 1, 0.05), xlim = c(0, 1))
+```
+
+We can see that the distribution of sample $\theta$ values is somewhat concentrated around the true value of `thetaTrue`. Let's take even more samples.
+
+```{r}
+samples <- abcInf(1000, dataSeq, 1)
+hist(samples, breaks = seq(0, 1, 0.05), xlim = c(0, 1))
+```
+
+The distribution is now somewhat smoother, and still around somewhere between 0.2 and 0.5.
+
+The mean value of the samples is
+
+```{r}
+mean(samples)
+```
+
+which is close to the true value of $\theta$.
+
+
+# Why to use a sampling procedure
+
+Out of curiosity, let's take the number of transitions in the given sequence and divide it by the total number of possible transitions in the sequence, which is the length of the sequence minus 1:
+
+```{r}
+countTrans(dataSeq) / (length(dataSeq) - 1)
+```
+
+The result is very close to the mean value we reached through ABC. So why bother going through ABC, when we could have reached a similar result in a much simpler way?
+
+The reason is that ABC approximates the *distribution* of the $\theta$ value, given an observed sequence, which gives us a lot more information than just taking the mean value. One important piece of information that a distribution gives us is how much concentrated it is around its mean. This is a measure of how confident one can be that the computed mean value is close to the true value of the parameter.
+
+In the above example, the distribution of $\theta$ values is rather wide, which means that we cannot be much confident about the parameter value that we have estimated. This is expected, since the provided sequence is rather small, consisting of only 10 states. Such a small sequence could have been produced by a wide variety of $\theta$ values.
+
+Let's consider a larger given sequence, to see how the computed distribution changes.
+
+```{r}
+dataSeq <- markov(50, thetaTrue)
+print(dataSeq)
+```
+
+```{r}
+samples <- abcInf(1000, dataSeq, 1)
+hist(samples, breaks = seq(0, 1, 0.05), xlim = c(0, 1))
+```
+
+The distribution now is much more concentrated. The mean value of the samples is
+
+```{r}
+mean(samples)
+```
+
+This amount of confidence is very important in order to make judgements about the computed parameters of a model and whether the available data are sufficient to make these judgements. This is related to the concept of statistical power, in statistics.
+
+These notes suffer from this problem too. If they are run with a different random number generation seed at the beginning, they may lead to very different outcomes, which may not be that representative as examples of the point I wish to make. However, if the notes are run several times, I expect that most of the times the produced output distributions will be similar to the ones that are shown here.
